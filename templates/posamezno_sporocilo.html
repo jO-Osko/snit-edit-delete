@@ -5,23 +5,12 @@
     <title></title>
 </head>
 <body>
-    <h1>
-        Id:
-    </h1>
-    <p>
-        {{ sporocilo.key.id()}}
-    </p>
-    <h2>
-        Besedilo:
-    </h2>
     <p>
         {{ sporocilo.besedilo }}
     </p>
-    <h2>
-        Ustvarjeno:
-    </h2>
-    <p>
-        {{ sporocilo.poslano }}
-    </p>
+
+    <a href="/sporocilo/{{ sporocilo.key.id() }}/uredi">Uredi</a>
+    <a href="/sporocilo/{{ sporocilo.key.id() }}/izbrisi">Izbriši</a>
+
 </body>
 </html>

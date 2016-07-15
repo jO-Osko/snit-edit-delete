@@ -48,12 +48,11 @@ class RezultatHandler(BaseHandler):
 class SeznamSporocilHandler(BaseHandler):
     def get(self):
 
-        vsa_sporocila = Sporocilo.query().fetch()
+        vsa_sporocila = Sporocilo.query(Sporocilo.izbrisano == False).fetchsa_sporocila()
 
         params = {"sporocila": vsa_sporocila}
 
         return self.render_template("vsa_sprocila.html", params=params)
-
 
 class PosameznoSporociloHandler(BaseHandler):
     def get(self, sporocilo_id):
@@ -64,10 +63,47 @@ class PosameznoSporociloHandler(BaseHandler):
         return self.render_template("posamezno_sporocilo.html",
                                     params=params)
 
+class UrediSporociloHandler(BaseHandler):
+    def get(self, sporocilo_id):
+        sporocilo = Sporocilo.get_by_id(int(sporocilo_id))
+
+        params = {"sporocilo": sporocilo}
+
+        return self.render_template("uredi_sporocilo.html",
+                                    params=params)
+    def post(self, sporocilo_id):
+        novo_besedilo = self.request.get("besedilo")
+        sporocilo = Sporocilo.get_by_id(int(sporocilo_id))
+        sporocilo.besedilo = novo_besedilo
+        sporocilo.put()
+
+        return self.redirect_to("seznam-sporocil")
+
+class IzbrisiSporociloHandler(BaseHandler):
+    def get(self, sporocilo_id):
+        sporocilo = Sporocilo.get_by_id(int(sporocilo_id))
+
+        params = {"sporocilo": sporocilo}
+
+        return self.render_template("izbrisi_sporocilo.html",
+                                    params=params)
+
+    def post(self, sporocilo_id):
+
+        sporocilo = Sporocilo.get_by_id(int(sporocilo_id))
+
+        sporocilo.izbrisano = True
+
+        sporocilo.put()
+
+        return self.redirect_to("seznam-sporocil")
+
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/', IndexHandler),
     webapp2.Route('/rezultat', RezultatHandler),
-    webapp2.Route('/vsa_sporocila', SeznamSporocilHandler),
-    webapp2.Route('/sporocilo/<sporocilo_id:\\d+>', PosameznoSporociloHandler)
+    webapp2.Route('/vsa_sporocila', SeznamSporocilHandler, name="seznam-sporocil"),
+    webapp2.Route('/sporocilo/<sporocilo_id:\\d+>', PosameznoSporociloHandler),
+    webapp2.Route('/sporocilo/<sporocilo_id:\\d+>/uredi', UrediSporociloHandler),
+    webapp2.Route('/sporocilo/<sporocilo_id:\\d+>/izbrisi', IzbrisiSporociloHandler)
 ], debug=True)
